@@ -5,6 +5,7 @@ import org.interview.task.dto.PlayerDto;
 import org.interview.task.helper.PlayerHelper;
 import org.testng.annotations.Test;
 
+import static java.net.HttpURLConnection.HTTP_FORBIDDEN;
 import static java.net.HttpURLConnection.HTTP_OK;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.interview.task.enums.UserRoles.SUPERVISOR;
@@ -50,4 +51,37 @@ public class UpdatePlayerTest extends BaseTest {
                 .usingRecursiveComparison()
                 .isEqualTo(getPlayer);
     }
+
+    @Test
+    public void shouldNotUpdatePlayerUsingInvalidEditor() {
+        // create test player
+        var createdPlayer = PlayerHelper.createValidPlayer();
+
+        // prepare update player dto
+        var updatedPlayerDto = PlayerDto.builder()
+                .age(38)
+                .gender("updatedGender")
+                .login("updatedLogin")
+                .password("updatedPassword")
+                .screenName("updatedScreenName")
+                .role("updatedRole")
+                .build();
+
+        // try to update player with invalid editor
+        var updatedPlayerResponse = playerApiClient
+                .updatePlayer("invalidEditor", createdPlayer.getId(), updatedPlayerDto);
+        // check status is forbidden
+        assertThat(updatedPlayerResponse.statusCode()).isEqualTo(HTTP_FORBIDDEN);
+
+        // retrieve player from the system
+        var getPlayerResponse = playerApiClient.getPlayerById(createdPlayer.getId());
+        var getPlayer = getPlayerResponse.as(PlayerDto.class);
+
+        // and verify it was NOT updated within the system
+        assertThat(createdPlayer)
+                .usingRecursiveComparison()
+                .isEqualTo(getPlayer);
+    }
+
+    // todo: write tests for update request fields validation
 }

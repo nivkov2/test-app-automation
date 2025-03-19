@@ -7,6 +7,7 @@ import org.testng.annotations.Test;
 
 import static java.net.HttpURLConnection.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.interview.task.enums.UserRoles.SUPERVISOR;
 
 public class CreatePlayerTest extends BaseTest {
 
@@ -25,9 +26,10 @@ public class CreatePlayerTest extends BaseTest {
                 .build();
 
         // send create player request
-        var createPlayerResponse = playerApiClient.createPlayerAs("supervisor", requestPlayer);
+        var createPlayerResponse = playerApiClient.createPlayerAs(SUPERVISOR.getValue(), requestPlayer);
         assertThat(createPlayerResponse.statusCode()).isEqualTo(HTTP_OK);
 
+        // todo: below validation fails due to bug for createPlayerResponseDto (returned null values)
         // verify that player response values equals to request values ( excluding id )
         var createdPlayer = createPlayerResponse.as(PlayerDto.class);
         assertThat(createdPlayer)
