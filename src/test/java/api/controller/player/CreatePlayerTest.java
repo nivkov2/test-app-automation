@@ -60,6 +60,7 @@ public class CreatePlayerTest extends BaseTest {
                 .build();
         var response = playerApiClient.createPlayerAs("invalideditor", requestPlayer);
         assertThat(response.statusCode()).isEqualTo(HTTP_FORBIDDEN);
+
     }
 
 
